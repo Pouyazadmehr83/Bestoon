@@ -1,64 +1,88 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse,HttpResponse
 from json import JSONEncoder
-from  .models import Expense,Income,Token,User
+from  .models import Expense,Income,User
 from datetime import datetime
-# Create your views here.
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login,logout
+
+#register
+@csrf_exempt
+@require_POST
+def register_api(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    email = request.POST.get("email")
+
+    if not username or not password:
+        return JsonResponse({"error": "missing fields"}, status=400)
+
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({"error": "user exists"}, status=400)
+
+    User.objects.create_user(
+        username=username,
+        password=password,
+        email=email
+    )
+
+    return JsonResponse({"status": "registered"})
+
+#login@require_POST
+@csrf_exempt
+@require_POST
+def login_api(request):
+    user = authenticate(
+        request,
+        username=request.POST.get("username"),
+        password=request.POST.get("password")
+    )
+
+    if not user:
+        return JsonResponse({"error": "invalid credentials"}, status=401)
+
+    login(request, user)  # ⭐ sessionid ساخته می‌شود
+    return JsonResponse({"status": "logged in"})
+@csrf_exempt
+def logout_api(request):
+    logout(request)
+    return JsonResponse({"status": "logged out"})
 
 @csrf_exempt
+@login_required
+@require_POST
 def submit_expense(request):
-    # با .get() کار کن تا ارور نده
-    this_token = request.POST.get('token')
-    amount = request.POST.get('amount')
-    description_text = request.POST.get('text')  # یا 'description'
+    amount = request.POST.get("amount")
+    description = request.POST.get("text")
 
-    if not this_token or not amount or not description_text:
-        return JsonResponse({"status": "error", "message": "missing fields"}, status=400)
-
-    try:
-        this_user = User.objects.get(token__token=this_token)
-    except User.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "invalid token"}, status=401)
-
-    try:
-        amount = float(amount)  # یا Decimal، اما برای سادگی
-    except ValueError:
-        return JsonResponse({"status": "error", "message": "invalid amount"}, status=400)
+    if not amount or not description:
+        return JsonResponse({"error": "missing fields"}, status=400)
 
     Expense.objects.create(
-        user=this_user,
+        user=request.user,
         amount=amount,
-        description=description_text,  # ← اینجا description باشه، نه text
-        # date رو نده، چون auto_now_add=True داره و خودش پر می‌کنه
+        description=description
     )
 
-    return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "expense added"})
 
 @csrf_exempt
+@login_required
+@require_POST
 def submit_income(request):
-    this_token = request.POST.get('token')
-    amount = request.POST.get('amount')
-    description_text = request.POST.get('text')  # یا 'description'
+    amount = request.POST.get("amount")
+    description = request.POST.get("text")
 
-    if not this_token or not amount or not description_text:
-        return JsonResponse({"status": "error", "message": "missing fields"}, status=400)
-
-    try:
-        this_user = User.objects.get(token__token=this_token)
-    except User.DoesNotExist:
-        return JsonResponse({"status": "error", "message": "invalid token"}, status=401)
-
-    try:
-        amount = float(amount)  # یا Decimal، اما برای سادگی
-    except ValueError:
-        return JsonResponse({"status": "error", "message": "invalid amount"}, status=400)
+    if not amount or not description:
+        return JsonResponse({"error": "missing fields"}, status=400)
 
     Income.objects.create(
-        user=this_user,
+        user=request.user,
         amount=amount,
-        description=description_text,  # ← اینجا description باشه، نه text
-        # date رو نده، چون auto_now_add=True داره و خودش پر می‌کنه
+        description=description
     )
 
-    return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "income added"})
