@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://www.google.com/recaptcha/api.js?render=YOUR_SITE_KEY"></script>
+</head>
+<body>
+
+<form id="loginForm">
+  <input name="username" value="test">
+  <input name="password" value="1234" type="password">
+  <button type="submit">Login</button>
+</form>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  grecaptcha.ready(function() {
+    grecaptcha.execute("YOUR_SITE_KEY", {action: "login"}).then(function(token) {
+
+      const data = new FormData();
+      data.append("username", "test");
+      data.append("password", "1234");
+      data.append("recaptcha", token);
+
+      fetch("/account/login/", {
+        method: "POST",
+        body: data
+      })
+      .then(r => r.json())
+      .then(console.log);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

@@ -8,6 +8,7 @@ from  .models import Expense,Income,User
 from datetime import datetime
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login,logout
+#from .utils import verify_recaptcha
 
 #register
 @csrf_exempt
@@ -31,6 +32,7 @@ def register_api(request):
 
     return JsonResponse({"status": "registered"})
 
+#add recaptcha to login after ui 
 #login@require_POST
 @csrf_exempt
 @require_POST
@@ -46,6 +48,8 @@ def login_api(request):
 
     login(request, user)  # ⭐ sessionid ساخته می‌شود
     return JsonResponse({"status": "logged in"})
+
+
 @csrf_exempt
 def logout_api(request):
     logout(request)
