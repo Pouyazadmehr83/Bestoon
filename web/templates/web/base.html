@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Bestoon{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Vazirmatn, Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            color: #333;
+        }
+
+        header {
+            background: #1f7a8c;
+            padding: 15px;
+        }
+
+        nav {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        nav a {
+            color: #fff;
+            margin-right: 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #1f7a8c;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            background: #1f7a8c;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #16606f;
+        }
+
+        .income {
+            background: #e6fffa;
+            border-left: 5px solid #2ec4b6;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .expense {
+            background: #ffe6e6;
+            border-left: 5px solid #e63946;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
+            color: #777;
+            font-size: 14px;
+        }
+        .alert {
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.alert.success {
+    background: #e6fffa;
+    color: #065f46;
+    border-left: 5px solid #10b981;
+}
+
+.alert.error {
+    background: #ffe6e6;
+    color: #7f1d1d;
+    border-left: 5px solid #ef4444;
+}
+
+.alert.info {
+    background: #e0f2fe;
+    color: #075985;
+    border-left: 5px solid #38bdf8;
+}
+.captcha img {
+    border: 1px solid #ccc;
+    margin-bottom: 8px;
+}
+
+
+    </style>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="{% url 'web:index' %}">Dashboard</a>
+        <a href="{% url 'web:logout' %}">Logout</a>
+        <a href="{% url 'web:profile' %}">{{ user.username }}</a>
+    </nav>
+</header>
+
+<div class="container">
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<footer>
+    Bestoon © 2026
+</footer>
+
+</body>
+</html>

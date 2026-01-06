@@ -1,0 +1,40 @@
+{% extends "web/base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2>Dashboard</h2>
+
+<h3>Add Income</h3>
+<form method="post" action="{% url 'web:submit_income' %}">
+    {% csrf_token %}
+    <input type="text" name="amount" placeholder="Amount">
+    <input type="text" name="text" placeholder="Description">
+    <button type="submit">Add Income</button>
+</form>
+
+<h3>Add Expense</h3>
+<form method="post" action="{% url 'web:submit_expense' %}">
+    {% csrf_token %}
+    <input type="text" name="amount" placeholder="Amount">
+    <input type="text" name="text" placeholder="Description">
+    <button type="submit">Add Expense</button>
+</form>
+
+<h3>History</h3>
+
+{% for inc in incomes %}
+    <div class="income">
+        💰 {{ inc.description }} — {{ inc.amount }}
+    </div>
+{% empty %}
+    <p>No income yet.</p>
+{% endfor %}
+
+{% for exp in expenses %}
+    <div class="expense">
+        💸 {{ exp.description }} — {{ exp.amount }}
+    </div>
+{% empty %}
+    <p>No expenses yet.</p>
+{% endfor %}
+{% endblock %}
